@@ -19,6 +19,7 @@
     ros2_control_params:=''
     load_gazebo_plugin:=false
     add_realsense_d435i:=false
+    add_realsense_d435i_tilt:=false
     add_d435i_links:=true
     use_gazebo_camera:=false
     add_other_geometry:=false
@@ -210,16 +211,23 @@
       </xacro:unless>
     </xacro:unless>
 
-    <xacro:if value="${add_realsense_d435i}">
+    <xacro:property name="gripper_fix_attach_xyz" value="0 0 0" />
+    <xacro:if value="${add_realsense_d435i or add_realsense_d435i_tilt}">
       <!-- (xarm) Load RealSense D435i URDF -->
-      <xacro:include filename="$(find xarm_description)/urdf/camera/realsense_d435i.urdf.xacro" />
+      <xacro:if value="${add_realsense_d435i_tilt}">
+        <xacro:include filename="$(find xarm_description)/urdf/camera/realsense_d435i_tilt.urdf.xacro" />
+        <xacro:property name="gripper_fix_attach_xyz" value="0 0 0.005" />
+      </xacro:if>
+      <xacro:unless value="${add_realsense_d435i_tilt}">
+        <xacro:include filename="$(find xarm_description)/urdf/camera/realsense_d435i.urdf.xacro" />
+      </xacro:unless>
       <xacro:d435i_urdf prefix="${prefix}" add_d435i_links="${add_d435i_links}" />
       <xacro:if value="${add_d435i_links}">
         <xacro:include filename="$(find xarm_description)/urdf/camera/realsense.gazebo.xacro" />
         <xacro:realsense_gazebo prefix="${prefix}" />
       </xacro:if>
     </xacro:if>
-    <xacro:unless value="${add_realsense_d435i}">
+    <xacro:unless value="${add_realsense_d435i or add_realsense_d435i_tilt}">
       <link name="${prefix}link_eef"/>
     </xacro:unless>
     <joint name="${prefix}joint_eef" type="fixed">
@@ -237,7 +245,8 @@
       <xacro:unless value="${robot_type == 'lite'}">
         <!-- Load XArm Gripper Model URDF -->
         <xacro:include filename="$(find xarm_description)/urdf/gripper/xarm_gripper_macro.xacro" />
-        <xacro:xarm_gripper_macro prefix="${prefix}" attach_to="${prefix}link_eef"
+        <xacro:xarm_gripper_macro prefix="${prefix}"
+          attach_to="${prefix}link_eef" attach_xyz="${gripper_fix_attach_xyz}"
           ros2_control_plugin="${ros2_control_plugin}" dof="${dof}" hard_interface="${hard_interface}" />
       </xacro:unless>
     </xacro:if>

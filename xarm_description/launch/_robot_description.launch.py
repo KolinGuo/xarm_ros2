@@ -45,6 +45,7 @@ def launch_setup(context, *args, **kwargs):
                     "dof",
                     "robot_type",
                     "add_realsense_d435i",
+                    "add_realsense_d435i_tilt",
                     "add_d435i_links",
                     "model1300",
                     "robot_sn",
@@ -140,6 +141,12 @@ def generate_launch_description():
             name="add_realsense_d435i",
             default_value="False",
             description="Add RealSense D435i camera with camera mount to link_eef",
+        ),
+        DeclareLaunchArgument(
+            name="add_realsense_d435i_tilt",
+            default_value="False",
+            description="Add RealSense D435i camera with tilted camera mount to "
+            "link_eef",
         ),
         DeclareLaunchArgument(
             name="add_d435i_links",
