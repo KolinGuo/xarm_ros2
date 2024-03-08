@@ -25,7 +25,7 @@
       <mesh filename="${mesh_filename}"/>
     </xacro:unless>
   </xacro:macro>
-  
+
   <xacro:macro name="common_link_visual" params="mesh_filename add_mesh_suffix:=true material_name:='White' origin_xyz:='0 0 0' origin_rpy:='0 0 0'">
     <visual>
       <geometry>
@@ -40,7 +40,7 @@
       <material name="${material_name}" />
     </visual>
   </xacro:macro>
-  
+
   <xacro:macro name="common_link_collision" params="mesh_filename add_mesh_suffix:=true origin_xyz:='0 0 0' origin_rpy:='0 0 0'">
     <collision>
       <geometry>
@@ -146,7 +146,7 @@
         </xacro:unless>
       </xacro:unless>
       <!-- <xacro:property name="hd_type" value="${robot_sn[11] if robot_sn[11] == 'B' or robot_sn[11] == 'L' or robot_sn[11] == 'X' or robot_sn[11] == 'D' else robot_sn[15] if robot_sn_len >= 16 and robot_sn[14] == '_' else ''}" /> -->
-      
+
       <xacro:if value="${hd_type == 'B'}">
         <xacro:if value="${date_int >= 2004}">
           <xacro:property name="mass_type" value="11" />

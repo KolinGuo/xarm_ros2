@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro" name="uf_bio_gripper">
   <xacro:macro name="bio_gripper_urdf" params="prefix:='' attach_to:='' attach_xyz:='0 0 0' attach_rpy:='0 0 0' ">
-    
+
     <xacro:unless value="${attach_to == ''}">
       <joint name="${prefix}bio_gripper_fix" type="fixed">
         <parent link="${attach_to}"/>
@@ -9,7 +9,7 @@
         <origin xyz="${attach_xyz}" rpy="${attach_rpy}"/>
       </joint>
     </xacro:unless>
-    
+
     <link name="${prefix}bio_gripper_base_link">
       <inertial>
         <origin xyz="0.016179 -2.3911E-05 0.023897" rpy="0 0 0" />
@@ -18,14 +18,14 @@
           ixx="0.00088398" ixy="4.8665E-08" ixz="5.6276E-06"
           iyy="0.00018256" iyz="4.0828E-08" izz="0.00094673" />
       </inertial>
-      <xacro:common_link_visual 
-        mesh_filename="gripper/bio/link_base"  
-        origin_xyz="0 0 0" 
+      <xacro:common_link_visual
+        mesh_filename="gripper/bio/link_base"
+        origin_xyz="0 0 0"
         origin_rpy="0 0 0"
         material_name="${prefix}White" />
-      <xacro:common_link_collision 
-        mesh_filename="gripper/bio/link_base"  
-        origin_xyz="0 0 0" 
+      <xacro:common_link_collision
+        mesh_filename="gripper/bio/link_base"
+        origin_xyz="0 0 0"
         origin_rpy="0 0 0" />
     </link>
 
@@ -37,14 +37,14 @@
           ixx="3.7322E-06" ixy="-4.1705E-06" ixz="4.0142E-06"
           iyy="1.744E-05" iyz="-1.2237E-06" izz="1.7775E-05" />
       </inertial>
-      <xacro:common_link_visual 
-        mesh_filename="gripper/bio/left_finger"  
-        origin_xyz="0 0 0" 
+      <xacro:common_link_visual
+        mesh_filename="gripper/bio/left_finger"
+        origin_xyz="0 0 0"
         origin_rpy="0 0 0"
         material_name="${prefix}White" />
-      <xacro:common_link_collision 
-        mesh_filename="gripper/bio/left_finger"  
-        origin_xyz="0 0 0" 
+      <xacro:common_link_collision
+        mesh_filename="gripper/bio/left_finger"
+        origin_xyz="0 0 0"
         origin_rpy="0 0 0" />
     </link>
     <joint name="${prefix}left_finger_joint" type="prismatic">
@@ -64,14 +64,14 @@
           ixx="4.1413E-06" ixy="3.9682E-06" ixz="4.5734E-06"
           iyy="1.6115E-05" iyz="1.6711E-06" izz="1.6032E-05" />
       </inertial>
-      <xacro:common_link_visual 
-        mesh_filename="gripper/bio/right_finger"  
-        origin_xyz="0 0 0" 
+      <xacro:common_link_visual
+        mesh_filename="gripper/bio/right_finger"
+        origin_xyz="0 0 0"
         origin_rpy="0 0 0"
         material_name="${prefix}White" />
-      <xacro:common_link_collision 
-        mesh_filename="gripper/bio/right_finger"  
-        origin_xyz="0 0 0" 
+      <xacro:common_link_collision
+        mesh_filename="gripper/bio/right_finger"
+        origin_xyz="0 0 0"
         origin_rpy="0 0 0" />
     </link>
     <joint name="${prefix}right_finger_joint" type="prismatic">
@@ -81,7 +81,7 @@
       <axis xyz="0 1 0" />
       <limit lower="0" upper="0.04" effort="2.0" velocity="0.1" />
     </joint>
-    
+
 
     <link name="${prefix}link_tcp" />
 

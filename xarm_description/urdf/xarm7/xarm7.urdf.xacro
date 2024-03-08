@@ -49,28 +49,28 @@
           ixx="0.0030595" ixy="0.00012259" ixz="-0.00062705"
           iyy="0.0037783" iyz="0.00027023" izz="0.0020125" />
       </inertial>
-      <xacro:common_link_visual 
-        mesh_filename="xarm7/visual/link_base"  
-        origin_xyz="0 0 0" 
+      <xacro:common_link_visual
+        mesh_filename="xarm7/visual/link_base"
+        origin_xyz="0 0 0"
         origin_rpy="0 0 0"
         material_name="${prefix}White" />
-      <xacro:common_link_collision 
-        mesh_filename="xarm7/visual/link_base"  
-        origin_xyz="0 0 0" 
+      <xacro:common_link_collision
+        mesh_filename="xarm7/visual/link_base"
+        origin_xyz="0 0 0"
         origin_rpy="0 0 0" />
     </link>
     <link name="${prefix}link1">
-      <xacro:common_link_inertial 
-        link_inertial_params="${inertial_params['link1']}" 
+      <xacro:common_link_inertial
+        link_inertial_params="${inertial_params['link1']}"
         origin_rpy="0 0 0"/>
-      <xacro:common_link_visual 
-        mesh_filename="xarm7/visual/link1"  
-        origin_xyz="0 0 0" 
+      <xacro:common_link_visual
+        mesh_filename="xarm7/visual/link1"
+        origin_xyz="0 0 0"
         origin_rpy="0 0 0"
         material_name="${prefix}White" />
-      <xacro:common_link_collision 
-        mesh_filename="xarm7/visual/link1"  
-        origin_xyz="0 0 0" 
+      <xacro:common_link_collision
+        mesh_filename="xarm7/visual/link1"
+        origin_xyz="0 0 0"
         origin_rpy="0 0 0" />
     </link>
     <joint name="${prefix}joint1" type="revolute">
@@ -87,17 +87,17 @@
       <dynamics damping="10" friction="1" />
     </joint>
     <link name="${prefix}link2">
-      <xacro:common_link_inertial 
-        link_inertial_params="${inertial_params['link2']}" 
+      <xacro:common_link_inertial
+        link_inertial_params="${inertial_params['link2']}"
         origin_rpy="0 0 0"/>
-      <xacro:common_link_visual 
-        mesh_filename="xarm7/visual/link2"  
-        origin_xyz="0 0 0" 
+      <xacro:common_link_visual
+        mesh_filename="xarm7/visual/link2"
+        origin_xyz="0 0 0"
         origin_rpy="0 0 0"
         material_name="${prefix}White" />
-      <xacro:common_link_collision 
-        mesh_filename="xarm7/visual/link2"  
-        origin_xyz="0 0 0" 
+      <xacro:common_link_collision
+        mesh_filename="xarm7/visual/link2"
+        origin_xyz="0 0 0"
         origin_rpy="0 0 0" />
     </link>
     <joint name="${prefix}joint2" type="revolute">
@@ -114,17 +114,17 @@
       <dynamics damping="10" friction="1" />
     </joint>
     <link name="${prefix}link3">
-      <xacro:common_link_inertial 
-        link_inertial_params="${inertial_params['link3']}" 
+      <xacro:common_link_inertial
+        link_inertial_params="${inertial_params['link3']}"
         origin_rpy="0 0 0"/>
-      <xacro:common_link_visual 
-        mesh_filename="xarm7/visual/link3"  
-        origin_xyz="0 0 0" 
+      <xacro:common_link_visual
+        mesh_filename="xarm7/visual/link3"
+        origin_xyz="0 0 0"
         origin_rpy="0 0 0"
         material_name="${prefix}White" />
-      <xacro:common_link_collision 
-        mesh_filename="xarm7/visual/link3"  
-        origin_xyz="0 0 0" 
+      <xacro:common_link_collision
+        mesh_filename="xarm7/visual/link3"
+        origin_xyz="0 0 0"
         origin_rpy="0 0 0" />
     </link>
     <joint name="${prefix}joint3" type="revolute">
@@ -141,17 +141,17 @@
       <dynamics damping="5" friction="1" />
     </joint>
     <link name="${prefix}link4">
-      <xacro:common_link_inertial 
-        link_inertial_params="${inertial_params['link4']}" 
+      <xacro:common_link_inertial
+        link_inertial_params="${inertial_params['link4']}"
         origin_rpy="0 0 0"/>
-      <xacro:common_link_visual 
-        mesh_filename="xarm7/visual/link4"  
-        origin_xyz="0 0 0" 
+      <xacro:common_link_visual
+        mesh_filename="xarm7/visual/link4"
+        origin_xyz="0 0 0"
         origin_rpy="0 0 0"
         material_name="${prefix}White" />
-      <xacro:common_link_collision 
-        mesh_filename="xarm7/visual/link4"  
-        origin_xyz="0 0 0" 
+      <xacro:common_link_collision
+        mesh_filename="xarm7/visual/link4"
+        origin_xyz="0 0 0"
         origin_rpy="0 0 0" />
     </link>
     <joint name="${prefix}joint4" type="revolute">
@@ -168,17 +168,17 @@
       <dynamics damping="5" friction="1" />
     </joint>
     <link name="${prefix}link5">
-      <xacro:common_link_inertial 
-        link_inertial_params="${inertial_params['link5']}" 
+      <xacro:common_link_inertial
+        link_inertial_params="${inertial_params['link5']}"
         origin_rpy="0 0 0"/>
-      <xacro:common_link_visual 
-        mesh_filename="xarm7/visual/link5"  
-        origin_xyz="0 0 0" 
+      <xacro:common_link_visual
+        mesh_filename="xarm7/visual/link5"
+        origin_xyz="0 0 0"
         origin_rpy="0 0 0"
         material_name="${prefix}White" />
-      <xacro:common_link_collision 
-        mesh_filename="xarm7/visual/link5"  
-        origin_xyz="0 0 0" 
+      <xacro:common_link_collision
+        mesh_filename="xarm7/visual/link5"
+        origin_xyz="0 0 0"
         origin_rpy="0 0 0" />
     </link>
     <joint name="${prefix}joint5" type="revolute">
@@ -195,17 +195,17 @@
       <dynamics damping="5" friction="1" />
     </joint>
     <link name="${prefix}link6">
-      <xacro:common_link_inertial 
-        link_inertial_params="${inertial_params['link6']}" 
+      <xacro:common_link_inertial
+        link_inertial_params="${inertial_params['link6']}"
         origin_rpy="0 0 0"/>
-      <xacro:common_link_visual 
-        mesh_filename="xarm7/visual/link6"  
-        origin_xyz="0 0 0" 
+      <xacro:common_link_visual
+        mesh_filename="xarm7/visual/link6"
+        origin_xyz="0 0 0"
         origin_rpy="0 0 0"
         material_name="${prefix}White" />
-      <xacro:common_link_collision 
-        mesh_filename="xarm7/visual/link6"  
-        origin_xyz="0 0 0" 
+      <xacro:common_link_collision
+        mesh_filename="xarm7/visual/link6"
+        origin_xyz="0 0 0"
         origin_rpy="0 0 0" />
     </link>
     <joint name="${prefix}joint6" type="revolute">
@@ -222,17 +222,17 @@
       <dynamics damping="2" friction="1" />
     </joint>
     <link name="${prefix}link7">
-      <xacro:common_link_inertial 
-        link_inertial_params="${inertial_params['link7']}" 
+      <xacro:common_link_inertial
+        link_inertial_params="${inertial_params['link7']}"
         origin_rpy="0 0 0"/>
-      <xacro:common_link_visual 
-        mesh_filename="${end_tool_visual_filename}"  
-        origin_xyz="0 0 0" 
+      <xacro:common_link_visual
+        mesh_filename="${end_tool_visual_filename}"
+        origin_xyz="0 0 0"
         origin_rpy="0 0 0"
         material_name="${prefix}Silver" />
-      <xacro:common_link_collision 
-        mesh_filename="${end_tool_collision_filename}"  
-        origin_xyz="0 0 0" 
+      <xacro:common_link_collision
+        mesh_filename="${end_tool_collision_filename}"
+        origin_xyz="0 0 0"
         origin_rpy="0 0 0" />
     </link>
     <joint name="${prefix}joint7" type="revolute">
@@ -255,6 +255,6 @@
       <parent link="${prefix}link7" />
       <child link="${prefix}link_eef" />
     </joint> -->
-  
+
   </xacro:macro>
 </robot>

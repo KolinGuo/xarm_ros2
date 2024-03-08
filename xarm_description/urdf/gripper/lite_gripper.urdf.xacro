@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro" name="uflite_gripper">
   <xacro:macro name="uflite_gripper_urdf" params="prefix:='' attach_to:='' attach_xyz:='0 0 0' attach_rpy:='0 0 0' ">
-    
+
     <xacro:unless value="${attach_to == ''}">
       <joint name="${prefix}gripper_fix" type="fixed">
         <parent link="${attach_to}"/>
@@ -9,7 +9,7 @@
         <origin xyz="${attach_xyz}" rpy="${attach_rpy}"/>
       </joint>
     </xacro:unless>
-    
+
     <link name="${prefix}uflite_gripper_link">
       <inertial>
         <origin xyz="0.0 0.0 0.030" rpy="0 0 0" />
@@ -18,14 +18,14 @@
           ixx="0.00047106" ixy="3.9292E-07" ixz="2.6537E-06"
           iyy="0.00033072" iyz="-1.0975E-05" izz="0.00025642" />
       </inertial>
-      <xacro:common_link_visual 
-        mesh_filename="gripper/lite/visual/gripper_lite"  
-        origin_xyz="0 0 0" 
+      <xacro:common_link_visual
+        mesh_filename="gripper/lite/visual/gripper_lite"
+        origin_xyz="0 0 0"
         origin_rpy="0 0 0"
         material_name="${prefix}White" />
-      <xacro:common_link_collision 
-        mesh_filename="gripper/lite/collision/gripper_lite"  
-        origin_xyz="0 0 0" 
+      <xacro:common_link_collision
+        mesh_filename="gripper/lite/collision/gripper_lite"
+        origin_xyz="0 0 0"
         origin_rpy="0 0 0" />
     </link>
 

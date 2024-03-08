@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://ros.org/wiki/xacro" name="xarm_gripper" >  
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="xarm_gripper" >
 
   <!-- xarm_gripper -->
   <xacro:include filename="$(find xarm_description)/urdf/gripper/xarm_gripper.ros2_control.xacro" />
@@ -7,7 +7,7 @@
   <xacro:include filename="$(find xarm_description)/urdf/gripper/xarm_gripper.transmission.xacro" />
   <xacro:include filename="$(find xarm_description)/urdf/gripper/xarm_gripper.gazebo.xacro" />
 
-  <xacro:macro name="xarm_gripper_macro" params="prefix:='' attach_to:='' ns:='xarm' attach_xyz:='0 0 0' attach_rpy:='0 0 0' 
+  <xacro:macro name="xarm_gripper_macro" params="prefix:='' attach_to:='' ns:='xarm' attach_xyz:='0 0 0' attach_rpy:='0 0 0'
     ros2_control_plugin:='uf_robot_hardware/UFRobotFakeSystemHardware' dof:=7 hard_interface:='PositionJointInterface' ">
 
     <xacro:if value="${is_ros2 and ros2_control_plugin != 'uf_robot_hardware/UFRobotSystemHardware'}">
@@ -23,7 +23,7 @@
     <xacro:if value="${not is_ros2}">
       <xacro:xarm_gazebo_grasp_fix prefix="${prefix}" palm_link="${prefix}link${dof}" />
     </xacro:if>
-    
+
     <!-- mimic_joint_plugin has to be installed: -->
     <xacro:mimic_joint_plugin_gazebo name_prefix="${prefix}left_finger_joint"
       following_joint="${prefix}drive_joint" mimic_joint="${prefix}left_finger_joint"
