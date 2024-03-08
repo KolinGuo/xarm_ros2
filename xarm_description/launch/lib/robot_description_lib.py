@@ -11,19 +11,20 @@ from launch_ros.substitutions import FindPackageShare
 
 
 def get_xacro_file_content(
-    xacro_file=PathJoinSubstitution([FindPackageShare('xarm_description'), 'urdf', 'xarm_device.urdf.xacro']), 
-    arguments={}):
+    xacro_file=PathJoinSubstitution([
+        FindPackageShare("xarm_description"),
+        "urdf",
+        "xarm_device.urdf.xacro",
+    ]),
+    arguments={},  # noqa: B006
+):
     command = [
-        PathJoinSubstitution([FindExecutable(name='xacro')]),
-        ' ',
+        PathJoinSubstitution([FindExecutable(name="xacro")]),
+        " ",
         xacro_file,
-        ' '
+        " ",
     ]
     if arguments and isinstance(arguments, dict):
         for key, val in arguments.items():
-            command.extend([
-                '{}:='.format(key),
-                val,
-                ' '
-            ])
+            command.extend([f"{key}:=", val, " "])
     return Command(command)
