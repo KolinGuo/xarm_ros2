@@ -222,7 +222,7 @@
         <xacro:include filename="$(find xarm_description)/urdf/camera/realsense_d435i.urdf.xacro" />
       </xacro:unless>
       <xacro:d435i_urdf prefix="${prefix}" add_d435i_links="${add_d435i_links}" />
-      <xacro:if value="${add_d435i_links}">
+      <xacro:if value="${load_gazebo_plugin and add_d435i_links}">
         <xacro:include filename="$(find xarm_description)/urdf/camera/realsense.gazebo.xacro" />
         <xacro:realsense_gazebo prefix="${prefix}" />
       </xacro:if>

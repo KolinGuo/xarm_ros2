@@ -8,6 +8,7 @@
     add_gripper:=false
     add_bio_gripper:=false
     ros2_control_plugin:='uf_robot_hardware/UFRobotSystemHardware'
+    load_gazebo_plugin:=false
     robot_ip:=''
     report_type:='normal'
     baud_checkset:='true'
@@ -23,8 +24,10 @@
       <xacro:include filename="$(find xarm_description)/urdf/xarm7/xarm7.ros2_control.xacro" />
     </xacro:if>
     <xacro:include filename="$(find xarm_description)/urdf/xarm7/xarm7.urdf.xacro" />
-    <xacro:include filename="$(find xarm_description)/urdf/xarm7/xarm7.transmission.xacro" />
-    <xacro:include filename="$(find xarm_description)/urdf/xarm7/xarm7.gazebo.xacro" />
+    <xacro:if value="${load_gazebo_plugin}">
+      <xacro:include filename="$(find xarm_description)/urdf/xarm7/xarm7.transmission.xacro" />
+      <xacro:include filename="$(find xarm_description)/urdf/xarm7/xarm7.gazebo.xacro" />
+    </xacro:if>
 
     <xacro:if value="${limited}">
       <xacro:if value="${is_ros2}">
@@ -69,9 +72,10 @@
         />
     </xacro:unless>
 
-    <xacro:xarm7_transmission prefix="${prefix}" hard_interface="${hard_interface}" />
-
-    <xacro:xarm7_gazebo prefix="${prefix}" />
+    <xacro:if value="${load_gazebo_plugin}">
+      <xacro:xarm7_transmission prefix="${prefix}" hard_interface="${hard_interface}" />
+      <xacro:xarm7_gazebo prefix="${prefix}" />
+    </xacro:if>
 
   </xacro:macro>
 

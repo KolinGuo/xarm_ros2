@@ -66,6 +66,7 @@ def launch_setup(context, *args, **kwargs):
                     "geometry_mesh_tcp_rpy",
                     "kinematics_suffix",
                     "ros2_control_plugin",
+                    "load_gazebo_plugin",
                     # "joint_states_remapping",
                 ]
             },
@@ -251,6 +252,11 @@ def generate_launch_description():
             name="ros2_control_plugin",
             default_value="uf_robot_hardware/UFRobotSystemHardware",
             description="Plugin for ros2_control",
+        ),
+        DeclareLaunchArgument(
+            name="load_gazebo_plugin",
+            default_value="True",
+            description="Load gazebo plugin and transmission elements",
         ),
         # DeclareLaunchArgument(
         #     name="joint_states_remapping", default_value="joint_states"
