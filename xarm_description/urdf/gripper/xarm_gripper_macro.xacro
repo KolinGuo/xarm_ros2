@@ -2,7 +2,9 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro" name="xarm_gripper" >
 
   <!-- xarm_gripper -->
-  <xacro:include filename="$(find xarm_description)/urdf/gripper/xarm_gripper.ros2_control.xacro" />
+  <xacro:if value="${is_ros2 and load_ros2_control}">
+    <xacro:include filename="$(find xarm_description)/urdf/gripper/xarm_gripper.ros2_control.xacro" />
+  </xacro:if>
   <xacro:include filename="$(find xarm_description)/urdf/gripper/xarm_gripper.urdf.xacro" />
   <!-- gazebo mimic joint plugin -->
   <xacro:if value="${load_gazebo_plugin}">
@@ -18,11 +20,12 @@
     attach_rpy:='0 0 0'
     ros2_control_plugin:='uf_robot_hardware/UFRobotFakeSystemHardware'
     load_gazebo_plugin:=false
+    load_ros2_control:=true
     dof:=7
     hard_interface:='PositionJointInterface' "
     >
 
-    <xacro:if value="${is_ros2 and ros2_control_plugin != 'uf_robot_hardware/UFRobotSystemHardware'}">
+    <xacro:if value="${is_ros2 and load_ros2_control and ros2_control_plugin != 'uf_robot_hardware/UFRobotSystemHardware'}">
       <xacro:xarm_gripper_ros2_control prefix="${prefix}" ros2_control_plugin="${ros2_control_plugin}" />
     </xacro:if>
 

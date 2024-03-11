@@ -18,6 +18,7 @@
     create_attach_link:=true
     ros2_control_params:=''
     load_gazebo_plugin:=false
+    load_ros2_control:=true
     add_realsense_d435i:=false
     add_realsense_d435i_tilt:=false
     add_d435i_links:=true
@@ -205,6 +206,7 @@
           baud_checkset="${baud_checkset}"
           default_gripper_baud="${default_gripper_baud}"
           model1300="${new_model1300}"
+          load_gazebo_plugin="$(arg load_gazebo_plugin)" load_ros2_control="$(arg load_ros2_control)"
           inertial_params_filename="${inertial_params_filename}"
           kinematics_params_filename="${kinematics_params_filename}"
           hard_interface="${hard_interface}" />

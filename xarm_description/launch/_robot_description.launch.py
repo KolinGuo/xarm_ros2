@@ -67,6 +67,7 @@ def launch_setup(context, *args, **kwargs):
                     "kinematics_suffix",
                     "ros2_control_plugin",
                     "load_gazebo_plugin",
+                    "load_ros2_control",
                     # "joint_states_remapping",
                 ]
             },
@@ -257,6 +258,11 @@ def generate_launch_description():
             name="load_gazebo_plugin",
             default_value="True",
             description="Load gazebo plugin and transmission elements",
+        ),
+        DeclareLaunchArgument(
+            name="load_ros2_control",
+            default_value="True",
+            description="Load ros2_control.xacro files",
         ),
         # DeclareLaunchArgument(
         #     name="joint_states_remapping", default_value="joint_states"
