@@ -11,6 +11,7 @@ import os
 from ament_index_python import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import (
+    DeclareLaunchArgument,
     IncludeLaunchDescription,
     OpaqueFunction,
 )
@@ -291,6 +292,7 @@ def launch_setup(context, *args, **kwargs):
                         "dof": dof,
                         "ros_queue_size": 10,
                         "joystick_type": joystick_type,
+                        "joy_topic": LaunchConfiguration("joy_topic"),
                     },
                 ],
                 # extra_arguments=[{'use_intra_process_comms': True}],
@@ -316,6 +318,14 @@ def launch_setup(context, *args, **kwargs):
 
 
 def generate_launch_description():
-    return LaunchDescription([
-        OpaqueFunction(function=launch_setup)
-    ])
+    # Declare arguments
+    declared_arguments = [
+        DeclareLaunchArgument(
+            name="joy_topic",
+            default_value="/joy",
+            description="Joystick sensor_msgs/msg/Joy topic",
+        ),
+    ]
+    return LaunchDescription(
+        declared_arguments + [OpaqueFunction(function=launch_setup)]
+    )
