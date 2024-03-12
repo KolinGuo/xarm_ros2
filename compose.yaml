@@ -13,6 +13,11 @@ x-app: &common
     - "/tmp/.X11-unix:/tmp/.X11-unix:rw"
     - ".:/ros2_ws/src/xarm_ros2"
   working_dir: /ros2_ws
+  network_mode: host
+  ipc: host
+  pid: host
+  privileged: true
+  runtime: nvidia
   build:
     context: .
     args:
@@ -20,9 +25,15 @@ x-app: &common
       PYMYCOBOT_VERSION: ">=2<3"
       BASE_IMAGE: nvidia/opengl:1.2-glvnd-runtime-ubuntu22.04
       WORKDIR: "/ros2_ws"
+  deploy:
+    resources:
+      reservations:
+        devices:
+          - driver: nvidia
+            count: all
+            capabilities: [gpu]
 
 services:
   nvidia-ros:
     <<: *common
     image: kolinguo/xarm_ros2:humble
-    runtime: nvidia
