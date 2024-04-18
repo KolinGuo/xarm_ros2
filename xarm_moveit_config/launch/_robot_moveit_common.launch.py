@@ -165,12 +165,28 @@ def launch_setup(context, *args, **kwargs):
     ompl_planning_pipeline_config = {
         'default_planning_pipeline': 'ompl',
         'planning_pipelines': ['ompl'],
-        'ompl': {
+    }
+    if os.environ.get('ROS_DISTRO', '') > 'iron':
+        ompl_planning_pipeline_config['ompl'] = {
+            'planning_plugins': ['ompl_interface/OMPLPlanner'],
+            'request_adapters': [
+                'default_planning_request_adapters/ResolveConstraintFrames',
+                'default_planning_request_adapters/ValidateWorkspaceBounds',
+                'default_planning_request_adapters/CheckStartStateBounds',
+                'default_planning_request_adapters/CheckStartStateCollision',
+            ],
+            'response_adapters': [
+                'default_planning_response_adapters/AddTimeOptimalParameterization',
+                'default_planning_response_adapters/ValidateSolution',
+                'default_planning_response_adapters/DisplayMotionPath',
+            ],
+        }
+    else:
+        ompl_planning_pipeline_config['ompl'] = {
             'planning_plugin': 'ompl_interface/OMPLPlanner',
             'request_adapters': """default_planner_request_adapters/AddTimeOptimalParameterization default_planner_request_adapters/FixWorkspaceBounds default_planner_request_adapters/FixStartStateBounds default_planner_request_adapters/FixStartStateCollision default_planner_request_adapters/FixStartStatePathConstraints""",
             'start_state_max_bounds_error': 0.1,
         }
-    }
     ompl_planning_pipeline_config['ompl'].update(ompl_planning_yaml)
 
     # Moveit controllers Configuration
@@ -208,18 +224,18 @@ def launch_setup(context, *args, **kwargs):
         # },
     }
 
-    sensor_maneger_parameters = {
-        'sensors': ['ros'],
-        'octomap_resolution': 0.02,
-        'ros.sensor_plugin': 'occupancy_map_monitor/PointCloudOctomapUpdater',
-        'ros.point_cloud_topic': '/camera/depth/color/points',
-        'ros.max_range': 2.0,
-        'ros.point_subsample': 1,
-        'ros.padding_offset': 0.1,
-        'ros.padding_scale': 1.0,
-        'ros.max_update_rate': 1.0,
-        'ros.filtered_cloud_topic': 'filtered_cloud',
-    }
+    # sensor_manager_parameters = {
+    #     'sensors': ['ros'],
+    #     'octomap_resolution': 0.02,
+    #     'ros.sensor_plugin': 'occupancy_map_monitor/PointCloudOctomapUpdater',
+    #     'ros.point_cloud_topic': '/camera/depth/color/points',
+    #     'ros.max_range': 2.0,
+    #     'ros.point_subsample': 1,
+    #     'ros.padding_offset': 0.1,
+    #     'ros.padding_scale': 1.0,
+    #     'ros.max_update_rate': 1.0,
+    #     'ros.filtered_cloud_topic': 'filtered_cloud',
+    # }
 
     # Start the actual move_group node/action server
     move_group_node = Node(
@@ -233,7 +249,7 @@ def launch_setup(context, *args, **kwargs):
             plan_execution,
             moveit_controllers,
             planning_scene_monitor_parameters,
-            sensor_maneger_parameters,
+            # sensor_manager_parameters,
             {'use_sim_time': use_sim_time},
         ],
     )
