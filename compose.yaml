@@ -23,7 +23,7 @@ x-app: &common
     args:
       ROS_DISTRO: "humble"
       PYMYCOBOT_VERSION: ">=2<3"
-      BASE_IMAGE: nvidia/opengl:1.2-glvnd-runtime-ubuntu22.04
+      BASE_IMAGE: kolinguo/ros2:devel
       WORKDIR: "/ros2_ws"
   deploy:
     resources:
@@ -37,3 +37,4 @@ services:
   nvidia-ros:
     <<: *common
     image: kolinguo/xarm_ros2:humble
+    container_name: xarm_ros2
