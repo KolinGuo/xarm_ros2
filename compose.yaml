@@ -1,40 +1,25 @@
-x-app: &common
-  command:
-    - >-
-      colcon build --symlink-install --packages-up-to xarm_controller
-      && source /ros2_ws/install/setup.bash
-      && ros2 launch xarm_description xarm7_rviz_display.launch.py model1300:=true
-      add_realsense_d435i_tilt:=true add_gripper:=true load_gazebo_plugin:=false load_ros2_control:=false
-  environment:
-    PYTHONUNBUFFERED: 1
-    QT_X11_NO_MITSHM: 1
-    DISPLAY: $DISPLAY
-  volumes:
-    - "/tmp/.X11-unix:/tmp/.X11-unix:rw"
-    - ".:/ros2_ws/src/xarm_ros2"
-  working_dir: /ros2_ws
-  network_mode: host
-  ipc: host
-  pid: host
-  privileged: true
-  runtime: nvidia
-  build:
-    context: .
-    args:
-      ROS_DISTRO: "humble"
-      PYMYCOBOT_VERSION: ">=2<3"
-      BASE_IMAGE: kolinguo/ros2:devel
-      WORKDIR: "/ros2_ws"
-  deploy:
-    resources:
-      reservations:
-        devices:
-          - driver: nvidia
-            count: all
-            capabilities: [gpu]
+name: xarm_ros2
 
 services:
   nvidia-ros:
-    <<: *common
+    extends:
+      file: compose_base.yaml
+      service: ros-gpu-gui
+    working_dir: /ros2_ws
+    command:
+      - >-
+        colcon build --symlink-install --packages-up-to xarm_controller
+        && source /ros2_ws/install/setup.bash
+        && ros2 launch xarm_description xarm7_rviz_display.launch.py model1300:=true
+        add_realsense_d435i_tilt:=true add_gripper:=true load_gazebo_plugin:=false
+        load_ros2_control:=false
+    volumes:
+      - ".:/ros2_ws/src/xarm_ros2"
     image: kolinguo/xarm_ros2:humble
     container_name: xarm_ros2
+    build:
+      context: .
+      args:
+        ROS_DISTRO: "humble"
+        BASE_IMAGE: kolinguo/ros2:devel
+        WORKDIR: "/ros2_ws"
