@@ -26,63 +26,16 @@ from launch_ros.substitutions import FindPackageShare
 
 
 def launch_setup(context, *args, **kwargs):
-    robot_ip = LaunchConfiguration("robot_ip", default="")
-    report_type = LaunchConfiguration("report_type", default="normal")
-    baud_checkset = LaunchConfiguration("baud_checkset", default=True)
-    default_gripper_baud = LaunchConfiguration("default_gripper_baud", default=2000000)
-    dof = LaunchConfiguration("dof", default=7)
-    prefix = LaunchConfiguration("prefix", default="")
-    hw_ns = LaunchConfiguration("hw_ns", default="xarm")
-    limited = LaunchConfiguration("limited", default=True)
-    effort_control = LaunchConfiguration("effort_control", default=False)
-    velocity_control = LaunchConfiguration("velocity_control", default=False)
-    add_gripper = LaunchConfiguration("add_gripper", default=False)
-    add_vacuum_gripper = LaunchConfiguration("add_vacuum_gripper", default=False)
-    add_bio_gripper = LaunchConfiguration("add_bio_gripper", default=False)
-    ros2_control_plugin = LaunchConfiguration(
-        "ros2_control_plugin", default="uf_robot_hardware/UFRobotFakeSystemHardware"
-    )
+    prefix = LaunchConfiguration("prefix").perform(context)
+    robot_type = LaunchConfiguration("robot_type").perform(context)
+    dof = LaunchConfiguration("dof").perform(context)
 
-    # 1: xbox360 wired
-    # 2: xbox360 wireless
-    # 3: spacemouse wireless
-    joystick_type = LaunchConfiguration("joystick_type", default=1)
-
-    add_realsense_d435i = LaunchConfiguration("add_realsense_d435i", default=False)
-    add_d435i_links = LaunchConfiguration("add_d435i_links", default=True)
-    model1300 = LaunchConfiguration("model1300", default=False)
-
-    add_other_geometry = LaunchConfiguration("add_other_geometry", default=False)
-    geometry_type = LaunchConfiguration("geometry_type", default="box")
-    geometry_mass = LaunchConfiguration("geometry_mass", default=0.1)
-    geometry_height = LaunchConfiguration("geometry_height", default=0.1)
-    geometry_radius = LaunchConfiguration("geometry_radius", default=0.1)
-    geometry_length = LaunchConfiguration("geometry_length", default=0.1)
-    geometry_width = LaunchConfiguration("geometry_width", default=0.1)
-    geometry_mesh_filename = LaunchConfiguration("geometry_mesh_filename", default="")
-    geometry_mesh_origin_xyz = LaunchConfiguration(
-        "geometry_mesh_origin_xyz", default='"0 0 0"'
-    )
-    geometry_mesh_origin_rpy = LaunchConfiguration(
-        "geometry_mesh_origin_rpy", default='"0 0 0"'
-    )
-    geometry_mesh_tcp_xyz = LaunchConfiguration(
-        "geometry_mesh_tcp_xyz", default='"0 0 0"'
-    )
-    geometry_mesh_tcp_rpy = LaunchConfiguration(
-        "geometry_mesh_tcp_rpy", default='"0 0 0"'
-    )
-
-    kinematics_suffix = LaunchConfiguration("kinematics_suffix", default="")
-
-    robot_type = LaunchConfiguration("robot_type", default="xarm")
+    add_gripper = LaunchConfiguration("add_gripper").perform(context)
+    add_bio_gripper = LaunchConfiguration("add_bio_gripper").perform(context)
 
     moveit_config_package_name = "xarm_moveit_config"
-    xarm_type = "{}{}".format(
-        robot_type.perform(context),
-        dof.perform(context) if robot_type.perform(context) in ("xarm", "lite") else "",
-    )
-    ros_namespace = LaunchConfiguration("ros_namespace", default="").perform(context)
+    xarm_type = "{}{}".format(robot_type, dof if robot_type in ("xarm", "lite") else "")
+    ros_namespace = LaunchConfiguration("ros_namespace").perform(context)
 
     # robot_description_parameters
     # xarm_moveit_config/launch/lib/robot_moveit_config_lib.py
@@ -93,90 +46,30 @@ def launch_setup(context, *args, **kwargs):
         )
     )
     robot_description_parameters = mod.get_xarm_robot_description_parameters(
-        xacro_urdf_file=PathJoinSubstitution([
-            FindPackageShare("xarm_description"),
-            "urdf/xarm_device.urdf.xacro",
-        ]),
-        xacro_srdf_file=PathJoinSubstitution([
-            FindPackageShare("xarm_moveit_config"),
-            "srdf/xarm.srdf.xacro",
-        ]),
-        urdf_arguments={
-            "prefix": prefix,
-            "hw_ns": hw_ns.perform(context).strip("/"),
-            "limited": limited,
-            "effort_control": effort_control,
-            "velocity_control": velocity_control,
-            "add_gripper": add_gripper,
-            "add_vacuum_gripper": add_vacuum_gripper,
-            "add_bio_gripper": add_bio_gripper,
-            "dof": dof,
-            "robot_type": robot_type,
-            "ros2_control_plugin": ros2_control_plugin,
-            "add_realsense_d435i": add_realsense_d435i,
-            "add_d435i_links": add_d435i_links,
-            "model1300": model1300,
-            "add_other_geometry": add_other_geometry,
-            "geometry_type": geometry_type,
-            "geometry_mass": geometry_mass,
-            "geometry_height": geometry_height,
-            "geometry_radius": geometry_radius,
-            "geometry_length": geometry_length,
-            "geometry_width": geometry_width,
-            "geometry_mesh_filename": geometry_mesh_filename,
-            "geometry_mesh_origin_xyz": geometry_mesh_origin_xyz,
-            "geometry_mesh_origin_rpy": geometry_mesh_origin_rpy,
-            "geometry_mesh_tcp_xyz": geometry_mesh_tcp_xyz,
-            "geometry_mesh_tcp_rpy": geometry_mesh_tcp_rpy,
-            "kinematics_suffix": kinematics_suffix,
-        },
-        srdf_arguments={
-            "prefix": prefix,
-            "dof": dof,
-            "robot_type": robot_type,
-            "add_gripper": add_gripper,
-            "add_vacuum_gripper": add_vacuum_gripper,
-            "add_other_geometry": add_other_geometry,
-        },
-        arguments={
-            "context": context,
-            "xarm_type": xarm_type,
-        },
+        context, xarm_type
     )
 
-    load_yaml = getattr(mod, "load_yaml")
-    servo_yaml = load_yaml("xarm_moveit_servo", "config/xarm_moveit_servo_config.yaml")
+    servo_yaml = mod.load_yaml(
+        "xarm_moveit_servo", "config/xarm_moveit_servo_config.yaml"
+    )
     servo_yaml["move_group_name"] = xarm_type
-    xarm_traj_controller = "{}{}_traj_controller".format(
-        prefix.perform(context), xarm_type
-    )
-    servo_yaml["command_out_topic"] = "/{}/joint_trajectory".format(
-        xarm_traj_controller
-    )
+    xarm_traj_controller = f"{prefix}{xarm_type}_traj_controller"
+    servo_yaml["command_out_topic"] = f"/{xarm_traj_controller}/joint_trajectory"
     servo_params = {"moveit_servo": servo_yaml}
     controllers = ["joint_state_broadcaster", xarm_traj_controller]
-    if (
-        add_gripper.perform(context) in ("True", "true")
-        and robot_type.perform(context) != "lite"
-    ):
-        controllers.append(
-            "{}{}_gripper_traj_controller".format(
-                prefix.perform(context), robot_type.perform(context)
-            )
-        )
-    elif (
-        add_bio_gripper.perform(context) in ("True", "true")
-        and robot_type.perform(context) != "lite"
-    ):
-        controllers.append(
-            "{}bio_gripper_traj_controller".format(prefix.perform(context))
-        )
+    if add_gripper in ("True", "true") and robot_type != "lite":
+        controllers.append(f"{prefix}{robot_type}_gripper_traj_controller")
+    elif add_bio_gripper in ("True", "true") and robot_type != "lite":
+        controllers.append(f"{prefix}bio_gripper_traj_controller")
 
-    # rviz_config_file = PathJoinSubstitution([FindPackageShare(moveit_config_package_name), 'rviz', 'moveit.rviz'])
+    # rviz_config_file = PathJoinSubstitution([
+    #     FindPackageShare(moveit_config_package_name),
+    #     "rviz",
+    #     "moveit.rviz",
+    # ])
     rviz_config_file = PathJoinSubstitution([
         FindPackageShare("xarm_moveit_servo"),
-        "rviz",
-        "servo.rviz",
+        "rviz/servo.rviz",
     ])
     rviz_node = Node(
         package="rviz2",
@@ -184,13 +77,8 @@ def launch_setup(context, *args, **kwargs):
         name="rviz2",
         output="screen",
         arguments=["-d", rviz_config_file],
-        parameters=[
-            robot_description_parameters,
-        ],
-        remappings=[
-            ("/tf", "tf"),
-            ("/tf_static", "tf_static"),
-        ],
+        parameters=[robot_description_parameters],
+        remappings=[("/tf", "tf"), ("/tf_static", "tf_static")],
     )
 
     # ros2 control launch
@@ -201,57 +89,23 @@ def launch_setup(context, *args, **kwargs):
                 FindPackageShare("xarm_controller"),
                 "launch/_ros2_control.launch.py",
             ])
-        ),
-        launch_arguments={
-            "robot_ip": robot_ip,
-            "report_type": report_type,
-            "baud_checkset": baud_checkset,
-            "default_gripper_baud": default_gripper_baud,
-            "prefix": prefix,
-            "hw_ns": hw_ns,
-            "limited": limited,
-            "effort_control": effort_control,
-            "velocity_control": velocity_control,
-            "add_gripper": add_gripper,
-            "add_vacuum_gripper": add_vacuum_gripper,
-            "add_bio_gripper": add_bio_gripper,
-            "dof": dof,
-            "robot_type": robot_type,
-            "ros2_control_plugin": ros2_control_plugin,
-            "add_realsense_d435i": add_realsense_d435i,
-            "add_d435i_links": add_d435i_links,
-            "model1300": model1300,
-            "add_other_geometry": add_other_geometry,
-            "geometry_type": geometry_type,
-            "geometry_mass": geometry_mass,
-            "geometry_height": geometry_height,
-            "geometry_radius": geometry_radius,
-            "geometry_length": geometry_length,
-            "geometry_width": geometry_width,
-            "geometry_mesh_filename": geometry_mesh_filename,
-            "geometry_mesh_origin_xyz": geometry_mesh_origin_xyz,
-            "geometry_mesh_origin_rpy": geometry_mesh_origin_rpy,
-            "geometry_mesh_tcp_xyz": geometry_mesh_tcp_xyz,
-            "geometry_mesh_tcp_rpy": geometry_mesh_tcp_rpy,
-            "kinematics_suffix": kinematics_suffix,
-        }.items(),
+        )
     )
 
     # Load controllers
-    load_controllers = []
-    for controller in controllers:
-        load_controllers.append(
-            Node(
-                package="controller_manager",
-                executable="spawner",
-                output="screen",
-                arguments=[
-                    controller,
-                    "--controller-manager",
-                    "{}/controller_manager".format(ros_namespace),
-                ],
-            )
+    load_controllers = [
+        Node(
+            package="controller_manager",
+            executable="spawner",
+            output="screen",
+            arguments=[
+                controller,
+                "--controller-manager",
+                f"{ros_namespace}/controller_manager",
+            ],
         )
+        for controller in controllers
+    ]
 
     # Launch as much as possible in components
     container = ComposableNodeContainer(
@@ -276,10 +130,7 @@ def launch_setup(context, *args, **kwargs):
                 package="moveit_servo",
                 plugin="moveit_servo::ServoNode",
                 name="servo_server",
-                parameters=[
-                    servo_params,
-                    robot_description_parameters,
-                ],
+                parameters=[servo_params, robot_description_parameters],
                 # extra_arguments=[{'use_intra_process_comms': True}],
             ),
             ComposableNode(
@@ -291,7 +142,7 @@ def launch_setup(context, *args, **kwargs):
                     {
                         "dof": dof,
                         "ros_queue_size": 10,
-                        "joystick_type": joystick_type,
+                        "joystick_type": LaunchConfiguration("joystick_type"),
                         "joy_topic": LaunchConfiguration("joy_topic"),
                     },
                 ],
@@ -310,22 +161,48 @@ def launch_setup(context, *args, **kwargs):
         output="screen",
     )
 
-    return [
-        rviz_node,
-        ros2_control_launch,
-        container,
-    ] + load_controllers
+    return [rviz_node, ros2_control_launch, container] + load_controllers
 
 
 def generate_launch_description():
     # Declare arguments
     declared_arguments = [
         DeclareLaunchArgument(
+            name="joystick_type",
+            default_value="1",
+            description="Joystick type "
+            "(1: xbox360 wired, 2: xbox360 wireless, 3: spacemouse wireless)",
+        ),
+        DeclareLaunchArgument(
             name="joy_topic",
             default_value="/joy",
             description="Joystick sensor_msgs/msg/Joy topic",
         ),
+        DeclareLaunchArgument(
+            name="ros_namespace",
+            default_value="",
+            description="ROS namespace for controller_manager",
+        ),
     ]
+
+    # Declared xarm_device arguments launch
+    xarm_device_args_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            PathJoinSubstitution([
+                FindPackageShare("xarm_description"),
+                "launch/_xarm_device_args.launch.py",
+            ])
+        ),
+        launch_arguments={
+            "limited": LaunchConfiguration("limited", default=True),
+            "ros2_control_plugin": LaunchConfiguration(
+                "ros2_control_plugin",
+                default="uf_robot_hardware/UFRobotFakeSystemHardware",
+            ),
+        }.items(),
+    )
+
     return LaunchDescription(
-        declared_arguments + [OpaqueFunction(function=launch_setup)]
+        declared_arguments
+        + [xarm_device_args_launch, OpaqueFunction(function=launch_setup)]
     )

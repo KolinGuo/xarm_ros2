@@ -10,184 +10,83 @@ import os
 
 from ament_index_python import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import EmitEvent, OpaqueFunction, RegisterEventHandler
+from launch.actions import (
+    DeclareLaunchArgument,
+    EmitEvent,
+    IncludeLaunchDescription,
+    OpaqueFunction,
+    RegisterEventHandler,
+)
 from launch.event_handlers import OnProcessExit
 from launch.events import Shutdown
-from launch.launch_description_sources import load_python_launch_file_as_module
+from launch.launch_description_sources import (
+    PythonLaunchDescriptionSource,
+    load_python_launch_file_as_module,
+)
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 
 def launch_setup(context, *args, **kwargs):
-    prefix = LaunchConfiguration("prefix", default="")
-    hw_ns = LaunchConfiguration("hw_ns", default="xarm")
-    limited = LaunchConfiguration("limited", default=True)
-    effort_control = LaunchConfiguration("effort_control", default=False)
-    velocity_control = LaunchConfiguration("velocity_control", default=False)
-    add_gripper = LaunchConfiguration("add_gripper", default=False)
-    add_vacuum_gripper = LaunchConfiguration("add_vacuum_gripper", default=False)
-    add_bio_gripper = LaunchConfiguration("add_bio_gripper", default=False)
-    dof = LaunchConfiguration("dof", default=7)
-    robot_type = LaunchConfiguration("robot_type", default="xarm")
-    no_gui_ctrl = LaunchConfiguration("no_gui_ctrl", default=False)
-    ros2_control_plugin = LaunchConfiguration(
-        "ros2_control_plugin", default="uf_robot_hardware/UFRobotFakeSystemHardware"
-    )
-    controllers_name = LaunchConfiguration(
-        "controllers_name", default="fake_controllers"
-    )
+    prefix = LaunchConfiguration("prefix").perform(context)
+    robot_type = LaunchConfiguration("robot_type").perform(context)
+    dof = LaunchConfiguration("dof").perform(context)
+
+    add_gripper = LaunchConfiguration("add_gripper").perform(context)
+    add_bio_gripper = LaunchConfiguration("add_bio_gripper").perform(context)
+
+    no_gui_ctrl = LaunchConfiguration("no_gui_ctrl").perform(context)
+    controllers_name = LaunchConfiguration("controllers_name").perform(context)
     moveit_controller_manager_key = LaunchConfiguration(
-        "moveit_controller_manager_key", default="moveit_fake_controller_manager"
-    )
+        "moveit_controller_manager_key"
+    ).perform(context)
     moveit_controller_manager_value = LaunchConfiguration(
-        "moveit_controller_manager_value",
-        default="moveit_fake_controller_manager/MoveItFakeControllerManager",
-    )
+        "moveit_controller_manager_value"
+    ).perform(context)
 
-    add_realsense_d435i = LaunchConfiguration("add_realsense_d435i", default=False)
-    add_d435i_links = LaunchConfiguration("add_d435i_links", default=True)
-    model1300 = LaunchConfiguration("model1300", default=False)
+    attach_xyz = LaunchConfiguration("attach_xyz").perform(context)
+    attach_rpy = LaunchConfiguration("attach_rpy").perform(context)
 
-    attach_to = LaunchConfiguration("attach_to", default="world")
-    attach_xyz = LaunchConfiguration("attach_xyz", default='"0 0 0"')
-    attach_rpy = LaunchConfiguration("attach_rpy", default='"0 0 0"')
-
-    add_other_geometry = LaunchConfiguration("add_other_geometry", default=False)
-    geometry_type = LaunchConfiguration("geometry_type", default="box")
-    geometry_mass = LaunchConfiguration("geometry_mass", default=0.1)
-    geometry_height = LaunchConfiguration("geometry_height", default=0.1)
-    geometry_radius = LaunchConfiguration("geometry_radius", default=0.1)
-    geometry_length = LaunchConfiguration("geometry_length", default=0.1)
-    geometry_width = LaunchConfiguration("geometry_width", default=0.1)
-    geometry_mesh_filename = LaunchConfiguration("geometry_mesh_filename", default="")
-    geometry_mesh_origin_xyz = LaunchConfiguration(
-        "geometry_mesh_origin_xyz", default='"0 0 0"'
-    )
-    geometry_mesh_origin_rpy = LaunchConfiguration(
-        "geometry_mesh_origin_rpy", default='"0 0 0"'
-    )
-    geometry_mesh_tcp_xyz = LaunchConfiguration(
-        "geometry_mesh_tcp_xyz", default='"0 0 0"'
-    )
-    geometry_mesh_tcp_rpy = LaunchConfiguration(
-        "geometry_mesh_tcp_rpy", default='"0 0 0"'
-    )
-
-    kinematics_suffix = LaunchConfiguration("kinematics_suffix", default="")
-
-    use_sim_time = LaunchConfiguration("use_sim_time", default=False)
+    use_sim_time = LaunchConfiguration("use_sim_time")
 
     moveit_config_package_name = "xarm_moveit_config"
-    xarm_type = "{}{}".format(
-        robot_type.perform(context),
-        dof.perform(context) if robot_type.perform(context) in ("xarm", "lite") else "",
-    )
+    xarm_type = "{}{}".format(robot_type, dof if robot_type in ("xarm", "lite") else "")
 
     # robot_description_parameters
     # xarm_moveit_config/launch/lib/robot_moveit_config_lib.py
     mod = load_python_launch_file_as_module(
         os.path.join(
             get_package_share_directory(moveit_config_package_name),
-            "launch",
-            "lib",
-            "robot_moveit_config_lib.py",
+            "launch/lib/robot_moveit_config_lib.py",
         )
     )
-    get_xarm_robot_description_parameters = getattr(
-        mod, "get_xarm_robot_description_parameters"
-    )
-    robot_description_parameters = get_xarm_robot_description_parameters(
-        xacro_urdf_file=PathJoinSubstitution([
-            FindPackageShare("xarm_description"),
-            "urdf",
-            "xarm_device.urdf.xacro",
-        ]),
-        xacro_srdf_file=PathJoinSubstitution([
-            FindPackageShare("xarm_moveit_config"),
-            "srdf",
-            "xarm.srdf.xacro",
-        ]),
-        urdf_arguments={
-            "prefix": prefix,
-            "hw_ns": hw_ns.perform(context).strip("/"),
-            "limited": limited,
-            "effort_control": effort_control,
-            "velocity_control": velocity_control,
-            "add_gripper": add_gripper,
-            "add_vacuum_gripper": add_vacuum_gripper,
-            "add_bio_gripper": add_bio_gripper,
-            "dof": dof,
-            "robot_type": robot_type,
-            "ros2_control_plugin": ros2_control_plugin,
-            "add_realsense_d435i": add_realsense_d435i,
-            "add_d435i_links": add_d435i_links,
-            "model1300": model1300,
-            "attach_to": attach_to,
-            "attach_xyz": attach_xyz,
-            "attach_rpy": attach_rpy,
-            "add_other_geometry": add_other_geometry,
-            "geometry_type": geometry_type,
-            "geometry_mass": geometry_mass,
-            "geometry_height": geometry_height,
-            "geometry_radius": geometry_radius,
-            "geometry_length": geometry_length,
-            "geometry_width": geometry_width,
-            "geometry_mesh_filename": geometry_mesh_filename,
-            "geometry_mesh_origin_xyz": geometry_mesh_origin_xyz,
-            "geometry_mesh_origin_rpy": geometry_mesh_origin_rpy,
-            "geometry_mesh_tcp_xyz": geometry_mesh_tcp_xyz,
-            "geometry_mesh_tcp_rpy": geometry_mesh_tcp_rpy,
-            "kinematics_suffix": kinematics_suffix,
-        },
-        srdf_arguments={
-            "prefix": prefix,
-            "dof": dof,
-            "robot_type": robot_type,
-            "add_gripper": add_gripper,
-            "add_vacuum_gripper": add_vacuum_gripper,
-            "add_bio_gripper": add_bio_gripper,
-            "add_other_geometry": add_other_geometry,
-        },
-        arguments={
-            "context": context,
-            "xarm_type": xarm_type,
-        },
+    robot_description_parameters = mod.get_xarm_robot_description_parameters(
+        context, xarm_type
     )
 
-    load_yaml = getattr(mod, "load_yaml")
-    controllers_yaml = load_yaml(
-        moveit_config_package_name,
-        "config",
-        xarm_type,
-        "{}.yaml".format(controllers_name.perform(context)),
+    controllers_yaml = mod.load_yaml(
+        moveit_config_package_name, f"config/{xarm_type}/{controllers_name}.yaml"
     )
-    ompl_planning_yaml = load_yaml(
-        moveit_config_package_name, "config", xarm_type, "ompl_planning.yaml"
+    ompl_planning_yaml = mod.load_yaml(
+        moveit_config_package_name, f"config/{xarm_type}/ompl_planning.yaml"
     )
     kinematics_yaml = robot_description_parameters["robot_description_kinematics"]
     joint_limits_yaml = robot_description_parameters.get(
         "robot_description_planning", None
     )
 
-    if add_gripper.perform(context) in ("True", "true"):
-        gripper_controllers_yaml = load_yaml(
+    if add_gripper in ("True", "true"):
+        gripper_controllers_yaml = mod.load_yaml(
             moveit_config_package_name,
-            "config",
-            "{}_gripper".format(robot_type.perform(context)),
-            "{}.yaml".format(controllers_name.perform(context)),
+            f"config/{robot_type}_gripper/{controllers_name}.yaml",
         )
-        gripper_ompl_planning_yaml = load_yaml(
+        gripper_ompl_planning_yaml = mod.load_yaml(
             moveit_config_package_name,
-            "config",
-            "{}_gripper".format(robot_type.perform(context)),
-            "ompl_planning.yaml",
+            f"config/{robot_type}_gripper/ompl_planning.yaml",
         )
-        gripper_joint_limits_yaml = load_yaml(
-            moveit_config_package_name,
-            "config",
-            "{}_gripper".format(robot_type.perform(context)),
-            "joint_limits.yaml",
+        gripper_joint_limits_yaml = mod.load_yaml(
+            moveit_config_package_name, f"config/{robot_type}_gripper/joint_limits.yaml"
         )
 
         if gripper_controllers_yaml and "controller_names" in gripper_controllers_yaml:
@@ -202,18 +101,15 @@ def launch_setup(context, *args, **kwargs):
             joint_limits_yaml["joint_limits"].update(
                 gripper_joint_limits_yaml["joint_limits"]
             )
-    elif add_bio_gripper.perform(context) in ("True", "true"):
-        gripper_controllers_yaml = load_yaml(
-            moveit_config_package_name,
-            "config",
-            "bio_gripper",
-            "{}.yaml".format(controllers_name.perform(context)),
+    elif add_bio_gripper in ("True", "true"):
+        gripper_controllers_yaml = mod.load_yaml(
+            moveit_config_package_name, f"config/bio_gripper/{controllers_name}.yaml"
         )
-        gripper_ompl_planning_yaml = load_yaml(
-            moveit_config_package_name, "config", "bio_gripper", "ompl_planning.yaml"
+        gripper_ompl_planning_yaml = mod.load_yaml(
+            moveit_config_package_name, "config/bio_gripper/ompl_planning.yaml"
         )
-        gripper_joint_limits_yaml = load_yaml(
-            moveit_config_package_name, "config", "bio_gripper", "joint_limits.yaml"
+        gripper_joint_limits_yaml = mod.load_yaml(
+            moveit_config_package_name, "config/bio_gripper/joint_limits.yaml"
         )
 
         if gripper_controllers_yaml and "controller_names" in gripper_controllers_yaml:
@@ -229,13 +125,12 @@ def launch_setup(context, *args, **kwargs):
                 gripper_joint_limits_yaml["joint_limits"]
             )
 
-    add_prefix_to_moveit_params = getattr(mod, "add_prefix_to_moveit_params")
-    add_prefix_to_moveit_params(
+    mod.add_prefix_to_moveit_params(
         controllers_yaml=controllers_yaml,
         ompl_planning_yaml=ompl_planning_yaml,
         kinematics_yaml=kinematics_yaml,
         joint_limits_yaml=joint_limits_yaml,
-        prefix=prefix.perform(context),
+        prefix=prefix,
     )
 
     # Planning Configuration
@@ -261,15 +156,15 @@ def launch_setup(context, *args, **kwargs):
     else:
         ompl_planning_pipeline_config["ompl"] = {
             "planning_plugin": "ompl_interface/OMPLPlanner",
-            "request_adapters": """default_planner_request_adapters/AddTimeOptimalParameterization default_planner_request_adapters/FixWorkspaceBounds default_planner_request_adapters/FixStartStateBounds default_planner_request_adapters/FixStartStateCollision default_planner_request_adapters/FixStartStatePathConstraints""",
+            "request_adapters": """default_planner_request_adapters/AddTimeOptimalParameterization default_planner_request_adapters/FixWorkspaceBounds default_planner_request_adapters/FixStartStateBounds default_planner_request_adapters/FixStartStateCollision default_planner_request_adapters/FixStartStatePathConstraints""",  # noqa: E501
             "start_state_max_bounds_error": 0.1,
         }
     ompl_planning_pipeline_config["ompl"].update(ompl_planning_yaml)
 
     # Moveit controllers Configuration
     moveit_controllers = {
-        moveit_controller_manager_key.perform(context): controllers_yaml,
-        "moveit_controller_manager": moveit_controller_manager_value.perform(context),
+        moveit_controller_manager_key: controllers_yaml,
+        "moveit_controller_manager": moveit_controller_manager_value,
     }
 
     # Trajectory Execution Configuration
@@ -332,11 +227,16 @@ def launch_setup(context, *args, **kwargs):
     )
 
     # rviz with moveit configuration
-    # rviz_config_file = PathJoinSubstitution([FindPackageShare(moveit_config_package_name), 'config', xarm_type, 'planner.rviz' if no_gui_ctrl.perform(context) == 'true' else 'moveit.rviz'])
+    # rviz_config_file = PathJoinSubstitution([
+    #    FindPackageShare(moveit_config_package_name),
+    #    "config",
+    #    xarm_type,
+    #    "planner.rviz" if no_gui_ctrl == "true" else "moveit.rviz",
+    # ])
     rviz_config_file = PathJoinSubstitution([
         FindPackageShare(moveit_config_package_name),
         "rviz",
-        "planner.rviz" if no_gui_ctrl.perform(context) == "true" else "moveit.rviz",
+        "planner.rviz" if no_gui_ctrl == "true" else "moveit.rviz",
     ])
     rviz2_node = Node(
         package="rviz2",
@@ -349,15 +249,12 @@ def launch_setup(context, *args, **kwargs):
             ompl_planning_pipeline_config,
             {"use_sim_time": use_sim_time},
         ],
-        remappings=[
-            ("/tf", "tf"),
-            ("/tf_static", "tf_static"),
-        ],
+        remappings=[("/tf", "tf"), ("/tf_static", "tf_static")],
     )
 
-    xyz = attach_xyz.perform(context)[1:-1].split(" ")
-    rpy = attach_rpy.perform(context)[1:-1].split(" ")
-    args = xyz + rpy + ["world", "{}link_base".format(prefix.perform(context))]
+    xyz = attach_xyz[1:-1].split(" ")
+    rpy = attach_rpy[1:-1].split(" ")
+    args = xyz + rpy + ["world", f"{prefix}link_base"]
 
     # Static TF
     static_tf = Node(
@@ -383,4 +280,53 @@ def launch_setup(context, *args, **kwargs):
 
 
 def generate_launch_description():
-    return LaunchDescription([OpaqueFunction(function=launch_setup)])
+    # Declare arguments
+    declared_arguments = [
+        DeclareLaunchArgument(
+            name="no_gui_ctrl",
+            default_value="False",
+            description="Turn off GUI control",
+        ),
+        DeclareLaunchArgument(
+            name="controllers_name",
+            default_value="fake_controllers",
+            description="Controllers name",  # TODO: what is this?
+        ),
+        DeclareLaunchArgument(
+            name="moveit_controller_manager_key",
+            default_value="moveit_fake_controller_manager",
+            description="MoveIt controller manager key",  # TODO: what is this?
+        ),
+        DeclareLaunchArgument(
+            name="moveit_controller_manager_value",
+            default_value="moveit_fake_controller_manager/MoveItFakeControllerManager",
+            description="MoveIt controller manager value",  # TODO: what is this?
+        ),
+        DeclareLaunchArgument(
+            name="use_sim_time",
+            default_value="False",
+            description="Use simulation time",
+        ),
+    ]
+
+    # Declared xarm_device arguments launch
+    xarm_device_args_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            PathJoinSubstitution([
+                FindPackageShare("xarm_description"),
+                "launch/_xarm_device_args.launch.py",
+            ])
+        ),
+        launch_arguments={
+            "limited": LaunchConfiguration("limited", default=True),
+            "ros2_control_plugin": LaunchConfiguration(
+                "ros2_control_plugin",
+                default="uf_robot_hardware/UFRobotFakeSystemHardware",
+            ),
+        }.items(),
+    )
+
+    return LaunchDescription(
+        declared_arguments
+        + [xarm_device_args_launch, OpaqueFunction(function=launch_setup)]
+    )
